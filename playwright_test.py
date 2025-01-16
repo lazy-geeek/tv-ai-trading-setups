@@ -1,11 +1,34 @@
-from playwright.sync_api import sync_playwright
+import shutil
+import os
 
-endpoint_url = "http://localhost:9222"
-website_url = "https://tradingview.com/chart/vmxrGQjo/"
+from playwright.sync_api import sync_playwright
+from decouple import config
+
+endpoint_url = config("ENDPOINT_URL")
+website_url = config("WEBSITE_URL")
+download_directory = config("DOWNLOAD_DIRECTORY")
+chart_reload_timeout = config("CHART_RELOAD_TIMEOUT")
+timeframes = config("TIMEFRAMES")
+symbols = config("SYMBOLS")
+
+
+def clear_download_directory():
+    # Delete all files from download directory
+    for filename in os.listdir(download_directory):
+        file_path = os.path.join(download_directory, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print("Failed to delete %s. Reason: %s" % (file_path, e))
+
 
 with sync_playwright() as p:
 
-    # TODO Set download directory
+    # Delete all files from download directory
+    clear_download_directory()
 
     # Connect to the existing browser instance
     browser = p.chromium.connect_over_cdp(endpoint_url)
@@ -15,32 +38,29 @@ with sync_playwright() as p:
 
     # Create a new page in the existing context
     page = context.new_page()
+    page.set_default_timeout(10000)
 
     # Navigate to a website (it should already be logged in)
     page.goto(website_url)
 
     # TODO Loop through watchlist symbols
 
-    # TODO Go to 5m timeframe
+    # Loop through timeframes
+    for timeframe in timeframes:
 
-    page.wait_for_timeout(5000)
-    page.keyboard.press("Control+Alt+S")
+        # Change timeframe by typing
+        page.keyboard.type(timeframe)
+        page.keyboard.press("Enter")
+        page.wait_for_timeout(chart_reload_timeout)
 
-    # TODO Go to 15m timeframe
+        # Download screenshot
+        with page.expect_download() as download_info:
+            page.keyboard.press("Control+Alt+S")
 
-    # TODO Press Auto adjust chart
-    page.wait_for_timeout(5000)
-    page.keyboard.press("Control+Alt+S")
+        download = download_info.value
 
-    # TODO Go to 1h timeframe
-
-    page.wait_for_timeout(5000)
-    page.keyboard.press("Control+Alt+S")
-
-    # TODO Go to 4h timeframe
-
-    page.wait_for_timeout(5000)
-    page.keyboard.press("Control+Alt+S")
+        # Wait for the download process to complete and save the downloaded file in specified path
+        download.save_as(download_directory + "/" + download.suggested_filename)
 
     # TODO Get Symbol Name from downloaded screenshot
 
