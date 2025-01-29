@@ -23,6 +23,9 @@ openai_base_url = "https://api.openai.com/v1/"
 deepseek_api_key = config("DEEPSEEK_API_KEY")
 deepseek_model = config("DEEPSEEK_MODEL")
 deepseek_base_url = "https://api.deepseek.ai/v1/"
+gemini_api_key = config("GEMINI_API_KEY")
+gemini_model = config("GEMINI_MODEL")
+gemini_base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
 anthropic_model = config("ANTHROPIC_MODEL")
 anthropic_api_key = config("ANTHROPIC_API_KEY")
 
@@ -112,7 +115,7 @@ def get_openai_trading_setup(openai_api_key, openai_base_url, model):
         return None
 
 
-def get_anthropic_trading_setup(anthropic_api_key, model):
+def get_anthropic_trading_setup():
 
     system_prompt = config("TRADING_SYSTEM_PROMPT")
 
@@ -122,7 +125,10 @@ def get_anthropic_trading_setup(anthropic_api_key, model):
         messages = anthropic_message_content()
 
         response = client.messages.create(
-            model=model, messages=messages, max_tokens=4096, system=system_prompt
+            model=anthropic_model,
+            messages=messages,
+            max_tokens=4096,
+            system=system_prompt,
         )
 
         return response.content[0].text
@@ -132,10 +138,13 @@ def get_anthropic_trading_setup(anthropic_api_key, model):
         return None
 
 
-# Loop through LLMs (OpenAI, Claude, Deepseek)
+def get_chatgpt_trading_setup():
+    return get_openai_trading_setup(openai_api_key, openai_base_url, openai_model)
 
-# openai_setup = get_openai_trading_setup(openai_api_key, openai_base_url, openai_model)
-# pprint(openai_setup)
 
-anthropic_setup = get_anthropic_trading_setup(anthropic_api_key, anthropic_model)
-pprint(anthropic_setup)
+def get_deepseek_trading_setup():
+    return get_openai_trading_setup(deepseek_api_key, deepseek_base_url, deepseek_model)
+
+
+def get_gemini_trading_setup():
+    return get_openai_trading_setup(gemini_api_key, gemini_base_url, gemini_model)
