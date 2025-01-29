@@ -1,13 +1,9 @@
 import shutil
 import os
-import base64
 import json
 
-
 from playwright.sync_api import sync_playwright
-from openai import OpenAI
 from decouple import config
-from pprint import pprint
 
 endpoint_url = config("ENDPOINT_URL")
 website_url = config("WEBSITE_URL")
@@ -15,11 +11,6 @@ download_directory = config("DOWNLOAD_DIRECTORY")
 chart_reload_timeout = int(config("CHART_RELOAD_TIMEOUT"))
 timeframes = json.loads(config("TIMEFRAMES"))
 symbols = json.loads(config("SYMBOLS"))
-openai_api_key = config("OPENAI_API_KEY")
-openai_base_url = "https://api.openai.com/v1/"
-deepseek_api_key = config("DEEPSEEK_API_KEY")
-deepseek_base_url = "https://api.deepseek.ai/v1/"
-anthropic_api_key = config("ANTHROPIC_API_KEY")
 
 
 def clear_download_directory():
@@ -33,39 +24,6 @@ def clear_download_directory():
                 shutil.rmtree(file_path)
         except Exception as e:
             print("Failed to delete %s. Reason: %s" % (file_path, e))
-
-
-def get_trading_setup(openai_api_key, openai_base_url, model):
-
-    system_prompt = config("TRADING_SYSTEM_PROMPT")
-    user_prompt = config("TRADING_USER_PROMPT")
-
-    try:
-
-        client = OpenAI(api_key=openai_api_key, base_url=openai_base_url)
-
-        system_message_content = [{"type": "text", "text": system_prompt}]
-        user_message_content = [{"type": "text", "text": user_prompt}]
-
-        # Add each file to the message content
-        for screenshot in download_directory:
-            with open(screenshot, "rb") as file:
-                file_content = base64.b64encode(file.read()).decode("utf-8")
-                user_message_content.append({"type": "file", "data": file_content})
-
-        response = client.ChatCompletion.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": system_message_content},
-                {"role": "user", "content": user_message_content},
-            ],
-        )
-
-        return response.choices[0].message.content
-
-    except Exception as e:
-        print(f"Error: {e}")
-        return None
 
 
 with sync_playwright() as p:
@@ -112,11 +70,6 @@ with sync_playwright() as p:
 
             # Wait for the download process to complete and save the downloaded file in specified path
             download.save_as(download_directory + "/" + download.suggested_filename)
-
-        # Loop through LLMs (OpenAI, Claude, Deepseek)
-
-        openai_setup = get_trading_setup(openai_api_key, openai_base_url, "gpt-4o")
-        pprint(openai_setup)
 
     # TODO Send downloaded screenshots to LLM for trading setup
 
