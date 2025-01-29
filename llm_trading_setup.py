@@ -60,6 +60,41 @@ def openai_message_content():
     return messages
 
 
+def anthropic_message_content():
+    user_prompt = config("TRADING_USER_PROMPT")
+
+    user_role = {"role": "user", "content": [{"type": "text", "text": user_prompt}]}
+
+    # Add images to the user message content
+    images_processed = 0
+    for screenshot in screenshot_files:
+        try:
+            with open(screenshot, "rb") as file:
+                base64_image = base64.b64encode(file.read()).decode("utf-8")
+                user_role["content"].append(
+                    {
+                        "type": "image",
+                        "source": {
+                            "type": "base64",
+                            "media_type": "image/png",
+                            "data": f"{base64_image}",
+                        },
+                    }
+                )
+                images_processed += 1
+        except Exception as e:
+            print(f"Error processing image {screenshot}: {e}")
+            continue
+
+    if images_processed == 0:
+        print("No valid images were processed. Cannot proceed with analysis.")
+        return None
+
+    messages = [user_role]
+
+    return messages
+
+
 def get_openai_trading_setup(openai_api_key, openai_base_url, model):
 
     try:
@@ -84,7 +119,7 @@ def get_anthropic_trading_setup(anthropic_api_key, model):
     try:
         client = Anthropic(api_key=anthropic_api_key)
 
-        messages = openai_message_content()
+        messages = anthropic_message_content()
 
         response = client.messages.create(
             model=model, messages=messages, max_tokens=4096, system=system_prompt
@@ -99,8 +134,8 @@ def get_anthropic_trading_setup(anthropic_api_key, model):
 
 # Loop through LLMs (OpenAI, Claude, Deepseek)
 
-openai_setup = get_openai_trading_setup(openai_api_key, openai_base_url, openai_model)
-pprint(openai_setup)
+# openai_setup = get_openai_trading_setup(openai_api_key, openai_base_url, openai_model)
+# pprint(openai_setup)
 
-# anthropic_setup = get_anthropic_trading_setup(anthropic_api_key, anthropic_model)
-# pprint(anthropic_setup)
+anthropic_setup = get_anthropic_trading_setup(anthropic_api_key, anthropic_model)
+pprint(anthropic_setup)
