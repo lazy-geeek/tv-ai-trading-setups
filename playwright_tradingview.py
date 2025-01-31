@@ -48,6 +48,8 @@ with sync_playwright() as p:
 
     for symbol in symbols:
 
+        download_directory = download_directory + "/" + symbol + "/"
+
         page.keyboard.type(symbol)
         page.wait_for_timeout(chart_reload_timeout)
         page.keyboard.press("Enter")
@@ -69,7 +71,7 @@ with sync_playwright() as p:
             download = download_info.value
 
             # Wait for the download process to complete and save the downloaded file in specified path
-            download.save_as(download_directory + "/" + download.suggested_filename)
+            download.save_as(download_directory + download.suggested_filename)
 
     # TODO Send downloaded screenshots to LLM for trading setup
 
