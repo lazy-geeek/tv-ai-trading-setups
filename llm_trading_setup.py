@@ -57,10 +57,6 @@ def generate_trading_setups():
         anthropic_setup = get_anthropic_trading_setup(screenshot_files)
         save_trading_setup_to_file(symbol, anthropic_setup, "claude")
 
-        print_status("Get Deepseek trading setup...")
-        deepseek_setup = get_deepseek_trading_setup(screenshot_files)
-        save_trading_setup_to_file(symbol, deepseek_setup, "deepseek")
-
 
 def openai_message_content(screenshot_files):
 
@@ -163,54 +159,6 @@ def get_chatgpt_trading_setup(screenshot_files):
     return get_openai_trading_setup(
         openai_api_key, openai_base_url, openai_model, screenshot_files
     )
-
-
-def deepseek_message_content(screenshot_files):
-    # Deepseek expects a simpler message format
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_prompt},
-    ]
-
-    # Add images to the user message
-    images_processed = 0
-    image_content = ""
-    for screenshot in screenshot_files:
-        try:
-            with open(screenshot, "rb") as file:
-                base64_image = base64.b64encode(file.read()).decode("utf-8")
-                image_content += f"\n<image>{base64_image}</image>"
-                images_processed += 1
-        except Exception as e:
-            print(f"Error processing image {screenshot}: {e}")
-            continue
-
-    if images_processed == 0:
-        print("No valid images were processed. Cannot proceed with analysis.")
-        return None
-
-    # Append images to the user message
-    messages[1]["content"] += image_content
-    return messages
-
-
-def get_deepseek_trading_setup(screenshot_files):
-    try:
-        client = OpenAI(api_key=deepseek_api_key, base_url=deepseek_base_url)
-        messages = deepseek_message_content(screenshot_files)
-
-        if messages is None:
-            return None
-
-        response = client.chat.completions.create(
-            model=deepseek_model, messages=messages
-        )
-
-        return response.choices[0].message.content
-
-    except Exception as e:
-        print(f"Error: {e}")
-        return None
 
 
 def get_gemini_trading_setup(screenshot_files):
