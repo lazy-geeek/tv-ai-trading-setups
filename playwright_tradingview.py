@@ -17,54 +17,59 @@ chart_reload_timeout = int(config("CHART_RELOAD_TIMEOUT"))
 timeframes = json.loads(config("TIMEFRAMES"))
 symbols = json.loads(config("SYMBOLS"))
 
-with sync_playwright() as p:
-    print_status("Taking Tradingview screenshots...")
 
-    # Delete all files from download directory
-    clear_download_directory()
+def take_tradingview_screenshots():
 
-    # Connect to the existing browser instance
-    browser = p.chromium.connect_over_cdp(endpoint_url)
+    with sync_playwright() as p:
+        print_status("Taking Tradingview screenshots...")
 
-    # Get the default browser context (this will use the existing user profile)
-    context = browser.contexts[0]
+        # Delete all files from download directory
+        clear_download_directory()
 
-    # Create a new page in the existing context
-    page = context.new_page()
-    page.set_default_timeout(10000)
+        # Connect to the existing browser instance
+        browser = p.chromium.connect_over_cdp(endpoint_url)
 
-    # Navigate to a website (it should already be logged in)
-    page.goto(website_url)
+        # Get the default browser context (this will use the existing user profile)
+        context = browser.contexts[0]
 
-    # Loop through symbols with a progress bar
-    for symbol in tqdm(symbols, desc="Processing Symbols"):
-        download_directory = get_symbol_directory(symbol)
+        # Create a new page in the existing context
+        page = context.new_page()
+        page.set_default_timeout(10000)
 
-        page.keyboard.type(symbol)
-        page.wait_for_timeout(chart_reload_timeout)
-        page.keyboard.press("Enter")
-        page.wait_for_timeout(chart_reload_timeout)
+        # Navigate to a website (it should already be logged in)
+        page.goto(website_url)
 
-        # Loop through timeframes for the current symbol with a progress bar
-        for timeframe in tqdm(timeframes, desc=f"Timeframes for {symbol}", leave=False):
-            # Change timeframe by typing
-            page.keyboard.type(timeframe)
+        # Loop through symbols with a progress bar
+        for symbol in tqdm(symbols, desc="Processing Symbols"):
+            download_directory = get_symbol_directory(symbol)
+
+            page.keyboard.type(symbol)
             page.wait_for_timeout(chart_reload_timeout)
             page.keyboard.press("Enter")
             page.wait_for_timeout(chart_reload_timeout)
 
-            # Download screenshot
-            with page.expect_download() as download_info:
-                page.keyboard.press("Control+Alt+S")
+            # Loop through timeframes for the current symbol with a progress bar
+            for timeframe in tqdm(
+                timeframes, desc=f"Timeframes for {symbol}", leave=False
+            ):
+                # Change timeframe by typing
+                page.keyboard.type(timeframe)
+                page.wait_for_timeout(chart_reload_timeout)
+                page.keyboard.press("Enter")
+                page.wait_for_timeout(chart_reload_timeout)
 
-            download = download_info.value
+                # Download screenshot
+                with page.expect_download() as download_info:
+                    page.keyboard.press("Control+Alt+S")
 
-            # Wait for the download process to complete and save the downloaded file in specified path
-            download.save_as(
-                os.path.join(download_directory, download.suggested_filename)
-            )
+                download = download_info.value
 
-    # Close page
-    page.close()
+                # Wait for the download process to complete and save the downloaded file in specified path
+                download.save_as(
+                    os.path.join(download_directory, download.suggested_filename)
+                )
 
-    print_status("Screenshots completed!")
+        # Close page
+        page.close()
+
+        print_status("Screenshots completed!")
