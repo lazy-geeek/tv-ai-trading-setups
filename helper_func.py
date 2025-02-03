@@ -10,6 +10,11 @@ def print_status(status):
     print(f"[{timestamp}]: {status}")
 
 
+def get_download_directory():
+    base_dir = config("DOWNLOAD_DIRECTORY")
+    return base_dir
+
+
 def get_symbol_directory(symbol):
     base_dir = config("DOWNLOAD_DIRECTORY")
     return os.path.join(base_dir, symbol)

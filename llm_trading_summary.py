@@ -5,7 +5,11 @@ from openpyxl import Workbook
 from openai import OpenAI
 from decouple import config
 
-from helper_func import get_trading_setups_directory, print_status
+from helper_func import (
+    get_download_directory,
+    get_trading_setups_directory,
+    print_status,
+)
 from llm_prompts import SUMMARY_SYSTEM_PROMPT
 from tqdm import tqdm
 
@@ -13,7 +17,7 @@ openai_model = config("EXTRACTION_MODEL")
 openai_api_key = config("OPENAI_API_KEY")
 
 symbols = json.loads(config("SYMBOLS"))
-download_directory = os.path.join(os.path.expanduser("~"), "Downloads")
+download_directory = get_download_directory()
 
 
 def summarize_trading_setups():
@@ -35,7 +39,7 @@ def summarize_trading_setups():
             file_path = os.path.join(directory, filename)
             with open(file_path, "r", encoding="utf-8") as f:
                 text = f.read()
-            response = client.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model=openai_model,
                 messages=[
                     {"role": "system", "content": SUMMARY_SYSTEM_PROMPT},
@@ -55,7 +59,7 @@ def summarize_trading_setups():
                 }
             sheet.append(
                 [
-                    filename,
+                    os.path.splitext(filename)[0],
                     summary.get("direction"),
                     summary.get("entry"),
                     summary.get("stop_loss"),
@@ -64,9 +68,7 @@ def summarize_trading_setups():
             )
 
     save_path = os.path.join(download_directory, "trading_summaries.xlsx")
+    if os.path.exists(save_path):
+        os.remove(save_path)
     workbook.save(save_path)
     print_status(f"Summaries written to {save_path}")
-
-
-if __name__ == "__main__":
-    summarize_trading_setups()
