@@ -10,6 +10,11 @@ def print_status(status):
     print(f"[{timestamp}]: {status}")
 
 
+def get_trading_setups_directory(symbol):
+    base_dir = config("DOWNLOAD_DIRECTORY")
+    return os.path.join(base_dir, symbol, "trading_setups")
+
+
 def save_trading_setup_to_file(symbol, trading_setup, file_name):
     if trading_setup is None or not trading_setup.strip():
         print_status(
@@ -17,12 +22,9 @@ def save_trading_setup_to_file(symbol, trading_setup, file_name):
         )
         return
 
-    base_dir = config("DOWNLOAD_DIRECTORY")
-    trading_setups_dir = os.path.join(base_dir, symbol, "trading_setups")
+    trading_setups_dir = get_trading_setups_directory(symbol)
 
-    # Create trading_setups directory if it doesn't exist
-    if not os.path.exists(trading_setups_dir):
-        os.makedirs(trading_setups_dir)
+    check_if_directory_exists(trading_setups_dir)
 
     file_path = os.path.join(trading_setups_dir, file_name + ".txt")
     with open(file_path, "w", encoding="utf-8") as file:

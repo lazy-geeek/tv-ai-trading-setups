@@ -72,15 +72,3 @@ with sync_playwright() as p:
 
             # Wait for the download process to complete and save the downloaded file in specified path
             download.save_as(download_directory + download.suggested_filename)
-
-    # TODO Send downloaded screenshots to LLM for trading setup
-
-    # TODO Send generated trading setups to LLM for evaluation and consolidation
-
-    # TODO If all LLMs give similar trading setup, add setup to mail body
-
-    # TODO When watchlist symbol loop has finished,
-    # Phase 1 -> Save to text file on computer
-    # Phase 2 -> Send email
-
-# TODO Function for Download Keypress
