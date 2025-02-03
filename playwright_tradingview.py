@@ -1,11 +1,15 @@
-import shutil
 import os
 import json
 
 from tqdm import tqdm
 from playwright.sync_api import sync_playwright
 from decouple import config
-from helper_func import print_status, get_download_directory, get_symbol_directory
+from helper_func import (
+    print_status,
+    get_download_directory,
+    get_symbol_directory,
+    clear_download_directory,
+)
 
 endpoint_url = config("ENDPOINT_URL")
 website_url = config("WEBSITE_URL")
@@ -13,23 +17,9 @@ chart_reload_timeout = int(config("CHART_RELOAD_TIMEOUT"))
 timeframes = json.loads(config("TIMEFRAMES"))
 symbols = json.loads(config("SYMBOLS"))
 
-download_directory = get_download_directory()
-
-
-def clear_download_directory():
-    # Delete all files from download directory
-    for filename in os.listdir(download_directory):
-        file_path = os.path.join(download_directory, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print_status("Failed to delete %s. Reason: %s" % (file_path, e))
-
-
 with sync_playwright() as p:
+    print_status("Taking Tradingview screenshots...")
+
     # Delete all files from download directory
     clear_download_directory()
 
@@ -70,4 +60,11 @@ with sync_playwright() as p:
             download = download_info.value
 
             # Wait for the download process to complete and save the downloaded file in specified path
-            download.save_as(download_directory + download.suggested_filename)
+            download.save_as(
+                os.path.join(download_directory, download.suggested_filename)
+            )
+
+    # Close page
+    page.close()
+
+    print_status("Screenshots completed!")

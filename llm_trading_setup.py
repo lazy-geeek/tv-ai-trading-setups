@@ -10,7 +10,7 @@ from tqdm import tqdm
 from pprint import pprint
 
 from llm_prompts import *
-from helper_func import print_status, save_trading_setup_to_file
+from helper_func import print_status, save_trading_setup_to_file, get_symbol_directory
 
 symbols = json.loads(config("SYMBOLS"))
 
@@ -31,14 +31,11 @@ user_prompt = TRADING_USER_PROMPT
 
 
 def generate_trading_setups():
-    for symbol in tqdm(symbols, desc="Processing Symbols"):
-        base_dir = config("DOWNLOAD_DIRECTORY")
-        symbol_dir = os.path.join(base_dir, symbol)
 
-        # Validate download directory exists
-        if not os.path.exists(symbol_dir):
-            print_status(f"Error: Download directory does not exist: {symbol_dir}")
-            continue
+    print_status("Generating trading setups...")
+
+    for symbol in tqdm(symbols, desc="Processing Symbols"):
+        symbol_dir = get_symbol_directory(symbol)
 
         # Get list of all files in the download directory
         screenshot_files = glob(os.path.join(symbol_dir, "*.png"))

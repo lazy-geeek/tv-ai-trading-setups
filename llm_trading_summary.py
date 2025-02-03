@@ -23,6 +23,9 @@ download_directory = get_download_directory()
 
 
 def summarize_trading_setups():
+
+    print_status("Summarizing trading setups to Excel...")
+
     workbook = Workbook()
     # Remove the default sheet created by Workbook
     default_sheet = workbook.active
