@@ -14,25 +14,28 @@ symbols = json.loads(config("SYMBOLS"))
 
 
 def summarize_trading_setups():
-    directory = get_trading_setups_directory()
+
     summaries = {}
     client = OpenAI(api_key=openai_api_key)
+
+    # Process all text files in the trading setups directory
+
     for symbol in symbols:
-        file_path = os.path.join(directory, f"{symbol}.txt")
-        if not os.path.exists(file_path):
-            print(f"File for {symbol} not found: {file_path}")
-            continue
-        with open(file_path, "r", encoding="utf-8") as f:
-            text = f.read()
-        response = client.ChatCompletion.create(
-            model=openai_model,
-            messages=[
-                {"role": "system", "content": SUMMARY_SYSTEM_PROMPT},
-                {"role": "user", "content": text},
-            ],
-        )
-        summary_text = response.choices[0].message.content
-        summaries[symbol] = summary_text
+        directory = get_trading_setups_directory(symbol)
+        for filename in os.listdir(directory):
+            if filename.lower().endswith(".txt"):
+                file_path = os.path.join(directory, filename)
+                with open(file_path, "r", encoding="utf-8") as f:
+                    text = f.read()
+                response = client.ChatCompletion.create(
+                    model=openai_model,
+                    messages=[
+                        {"role": "system", "content": SUMMARY_SYSTEM_PROMPT},
+                        {"role": "user", "content": text},
+                    ],
+                )
+            summary_text = response.choices[0].message.content
+            summaries[filename] = summary_text
     print(json.dumps(summaries, indent=2))
 
 
