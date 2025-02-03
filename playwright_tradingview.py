@@ -2,15 +2,18 @@ import shutil
 import os
 import json
 
+from tqdm import tqdm
 from playwright.sync_api import sync_playwright
 from decouple import config
+from helper_func import print_status, get_download_directory, get_symbol_directory
 
 endpoint_url = config("ENDPOINT_URL")
 website_url = config("WEBSITE_URL")
-download_directory = config("DOWNLOAD_DIRECTORY")
 chart_reload_timeout = int(config("CHART_RELOAD_TIMEOUT"))
 timeframes = json.loads(config("TIMEFRAMES"))
 symbols = json.loads(config("SYMBOLS"))
+
+download_directory = get_download_directory()
 
 
 def clear_download_directory():
@@ -23,11 +26,10 @@ def clear_download_directory():
             elif os.path.isdir(file_path):
                 shutil.rmtree(file_path)
         except Exception as e:
-            print("Failed to delete %s. Reason: %s" % (file_path, e))
+            print_status("Failed to delete %s. Reason: %s" % (file_path, e))
 
 
 with sync_playwright() as p:
-
     # Delete all files from download directory
     clear_download_directory()
 
@@ -44,20 +46,17 @@ with sync_playwright() as p:
     # Navigate to a website (it should already be logged in)
     page.goto(website_url)
 
-    # Loop through symbols
-
-    for symbol in symbols:
-
-        download_directory = download_directory + "/" + symbol + "/"
+    # Loop through symbols with a progress bar
+    for symbol in tqdm(symbols, desc="Processing Symbols"):
+        download_directory = get_symbol_directory(symbol)
 
         page.keyboard.type(symbol)
         page.wait_for_timeout(chart_reload_timeout)
         page.keyboard.press("Enter")
         page.wait_for_timeout(chart_reload_timeout)
 
-        # Loop through timeframes
-        for timeframe in timeframes:
-
+        # Loop through timeframes for the current symbol with a progress bar
+        for timeframe in tqdm(timeframes, desc=f"Timeframes for {symbol}", leave=False):
             # Change timeframe by typing
             page.keyboard.type(timeframe)
             page.wait_for_timeout(chart_reload_timeout)

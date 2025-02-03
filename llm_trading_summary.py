@@ -2,6 +2,8 @@ import json
 import os
 
 from openpyxl import Workbook
+from openpyxl.styles import Font
+from openpyxl.utils import get_column_letter
 from openai import OpenAI
 from decouple import config
 
@@ -67,6 +69,26 @@ def summarize_trading_setups():
                 ]
             )
 
+    # Apply formatting to all sheets after processing
+    for sheet in workbook.worksheets:
+        # Bold header row cells
+        for cell in sheet[1]:
+            cell.font = Font(bold=True)
+        # Bold first column cells
+        for row in sheet.iter_rows(min_col=1, max_col=1):
+            for cell in row:
+                cell.font = Font(bold=True)
+        # Auto-size columns
+        for col in sheet.columns:
+            max_length = 0
+            col_letter = get_column_letter(col[0].column)
+            for cell in col:
+                if cell.value:
+                    cell_length = len(str(cell.value))
+                    if cell_length > max_length:
+                        max_length = cell_length
+            adjusted_width = max_length + 2
+            sheet.column_dimensions[col_letter].width = adjusted_width
     save_path = os.path.join(download_directory, "trading_summaries.xlsx")
     if os.path.exists(save_path):
         os.remove(save_path)

@@ -6,6 +6,7 @@ from glob import glob
 from openai import OpenAI
 from anthropic import Anthropic
 from decouple import config
+from tqdm import tqdm
 from pprint import pprint
 
 from llm_prompts import *
@@ -30,19 +31,21 @@ user_prompt = TRADING_USER_PROMPT
 
 
 def generate_trading_setups():
-    for symbol in symbols:
+    for symbol in tqdm(symbols, desc="Processing Symbols"):
         base_dir = config("DOWNLOAD_DIRECTORY")
         symbol_dir = os.path.join(base_dir, symbol)
 
         # Validate download directory exists
         if not os.path.exists(symbol_dir):
-            print(f"Error: Download directory does not exist: {symbol_dir}")
+            print_status(f"Error: Download directory does not exist: {symbol_dir}")
             continue
 
         # Get list of all files in the download directory
         screenshot_files = glob(os.path.join(symbol_dir, "*.png"))
         if not screenshot_files:
-            print(f"Warning: No screenshots found in download directory: {symbol_dir}")
+            print_status(
+                f"Warning: No screenshots found in download directory: {symbol_dir}"
+            )
             continue
 
         print_status("Get ChatGPT trading setup...")
@@ -77,11 +80,11 @@ def openai_message_content(screenshot_files):
                 )
                 images_processed += 1
         except Exception as e:
-            print(f"Error processing image {screenshot}: {e}")
+            print_status(f"Error processing image {screenshot}: {e}")
             continue
 
     if images_processed == 0:
-        print("No valid images were processed. Cannot proceed with analysis.")
+        print_status("No valid images were processed. Cannot proceed with analysis.")
         return None
 
     messages = [system_role, user_role]
@@ -110,11 +113,11 @@ def anthropic_message_content(screenshot_files):
                 )
                 images_processed += 1
         except Exception as e:
-            print(f"Error processing image {screenshot}: {e}")
+            print_status(f"Error processing image {screenshot}: {e}")
             continue
 
     if images_processed == 0:
-        print("No valid images were processed. Cannot proceed with analysis.")
+        print_status("No valid images were processed. Cannot proceed with analysis.")
         return None
 
     messages = [user_role]
@@ -132,7 +135,7 @@ def get_openai_trading_setup(openai_api_key, openai_base_url, model, screenshot_
         return response.choices[0].message.content
 
     except Exception as e:
-        print(f"Error: {e}")
+        print_status(f"Error: {e}")
         return None
 
 
@@ -151,7 +154,7 @@ def get_anthropic_trading_setup(screenshot_files):
         return response.content[0].text
 
     except Exception as e:
-        print(f"Error: {e}")
+        print_status(f"Error: {e}")
         return None
 
 
