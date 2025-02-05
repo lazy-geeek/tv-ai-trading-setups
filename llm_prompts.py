@@ -26,7 +26,7 @@ Entry: 1.2750 (break of 1H order block after liquidity sweep at 1.2780)
 Stop Loss: 1.2810 (above daily swing high + 1.5x ATR)
 Take Profit: 1.2650 (daily FVG fill + 1.618 Fib extension)
 
-Don't recommend a trading setup if the current market situation is not clear enough or the desired risk reward ratio can not be fulfilled.
+Don't recommend a trading setup if the current market situation is not clear enough or the minimum risk reward ratio can not be fulfilled.
 """
 
 SUMMARY_SYSTEM_PROMPT = """Extract these values from the text:
@@ -35,7 +35,14 @@ SUMMARY_SYSTEM_PROMPT = """Extract these values from the text:
 - Stop loss (number)
 - Take profit (number)
 
-Return ONLY as JSON format with keys: direction, entry, stop_loss, take_profit.
+Calculate these values:
+- Risk reward ratio (number)
+- Stop loss pips (number)
+- Take profit pips (number)
+
+If there is no clear trading setup, return "None" as direction and zero for all numbers.
+
+Return ONLY as JSON format with keys: direction, entry, stop_loss, take_profit, rrr, stop_loss_pips, take_profit_pips
 No further comments in your response, only JSON.
 """
 SUMMARY_USER_PROMPT = "."

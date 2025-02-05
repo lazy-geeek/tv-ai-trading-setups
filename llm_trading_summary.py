@@ -37,7 +37,18 @@ def summarize_trading_setups():
         directory = get_trading_setups_directory(symbol)
         # Create a new sheet for each symbol and add header row
         sheet = workbook.create_sheet(title=symbol)
-        sheet.append(["Filename", "Direction", "Entry", "Stop_Loss", "Take_Profit"])
+        sheet.append(
+            [
+                "Filename",
+                "Direction",
+                "Entry",
+                "Stop Loss",
+                "Take Profit",
+                "RRR",
+                "Stop Loss Pips",
+                "Take Profit Pips",
+            ]
+        )
 
         files = [f for f in os.listdir(directory) if f.lower().endswith(".txt")]
         for filename in tqdm(files, desc=f"Processing files for {symbol}", leave=False):
@@ -61,6 +72,9 @@ def summarize_trading_setups():
                     "entry": None,
                     "stop_loss": None,
                     "take_profit": None,
+                    "rrr": None,
+                    "stop_loss_pips": None,
+                    "take_profit_pips": None,
                 }
             sheet.append(
                 [
@@ -69,6 +83,9 @@ def summarize_trading_setups():
                     summary.get("entry"),
                     summary.get("stop_loss"),
                     summary.get("take_profit"),
+                    summary.get("rrr"),
+                    summary.get("stop_loss_pips"),
+                    summary.get("take_profit_pips"),
                 ]
             )
 
