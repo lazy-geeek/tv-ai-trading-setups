@@ -6,6 +6,7 @@ from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 from openai import OpenAI
 from decouple import config
+from datetime import datetime
 
 from helper_func import (
     get_download_directory,
@@ -109,7 +110,9 @@ def summarize_trading_setups():
                         max_length = cell_length
             adjusted_width = max_length + 2
             sheet.column_dimensions[col_letter].width = adjusted_width
-    save_path = os.path.join(download_directory, "trading_summaries.xlsx")
+    timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M")
+    filename = f"trading_summaries-{timestamp}.xlsx"
+    save_path = os.path.join(download_directory, filename)
     if os.path.exists(save_path):
         os.remove(save_path)
     workbook.save(save_path)

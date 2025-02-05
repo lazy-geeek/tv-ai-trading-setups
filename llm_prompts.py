@@ -2,21 +2,20 @@ TRADING_SYSTEM_PROMPT = "You are an expert in analyzing screenshots of candlesti
 TRADING_USER_PROMPT = """
 Analyze the provided forex candlestick charts as if you are an advanced quantitative strategist at a Tier 1 prop firm. Develop a high-probability profitable trading setup using the following:
 
-• Each chart screenshot contains a 50 sma (blue) and 200 sma (yellow).
 • Examine all timeframes from provided screeenshots.
 • Identify the overall market structure (uptrend, downtrend, or range) across these timeframes.
 • Use any relevant indicators or tools (e.g., moving averages, RSI, MACD, Bollinger Bands, Ichimoku Cloud).
 • Identify important support/resistance levels, supply/demand zones, pivot points, Fibonacci retracements or extensions and psychological round numbers.
-• Identify any emerging or established chart patterns (e.g., triangles, head & shoulders, harmonic patterns).
-• Include significant price action signals (pin bars, engulfing candles, dojis) and what they might indicate about future movement.
+• Identify any emerging or established chart patterns (e.g., triangles, head & shoulders, harmonic patterns, etc).
+• Include significant price action signals (pin bars, engulfing candles, dojis, etc) and what they might indicate about future movement.
 • Assess underlying order blocks, supply/demand imbalances, or liquidity zones visible on the chart.
 • Assess volume spikes or momentum shifts if applicable.
 • Determine if there is any evidence of smart money concepts (e.g., stop hunts, institutional “fakeouts,” or springboard entries).
 • Recommend a direction (long or short) with clear justification.
 • Use pending orders at specific price levels (e.g., buy limit, sell stop).
-• Stop-loss placement (exact level or range), explained by key technical zones or volatility considerations.
+• Stop-loss placement (exact level), explained by key technical zones or volatility considerations.
 • Take-profit target, justified by major support/resistance, Fibonacci levels or target the next liquidity pool
-• The Risk/Reward ratio should at least be 1:2.
+• The Risk/Reward ratio must at least be 1:2.
 
 Example Output Format:
 
