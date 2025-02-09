@@ -36,22 +36,9 @@ def summarize_trading_setups():
 
     for symbol in tqdm(symbols, desc="Processing symbols"):
         directory = get_trading_setups_directory(symbol)
-        # Create a new sheet for each symbol and add header row
-        sheet = workbook.create_sheet(title=symbol)
-        sheet.append(
-            [
-                "Filename",
-                "Direction",
-                "Entry",
-                "Stop Loss",
-                "Take Profit",
-                "RRR",
-                "Stop Loss Pips",
-                "Take Profit Pips",
-            ]
-        )
-
         files = [f for f in os.listdir(directory) if f.lower().endswith(".txt")]
+        directions = set()
+        summaries = []
         for filename in tqdm(files, desc=f"Processing files for {symbol}", leave=False):
             file_path = os.path.join(directory, filename)
             with open(file_path, "r", encoding="utf-8") as f:
@@ -67,7 +54,6 @@ def summarize_trading_setups():
             try:
                 summary = json.loads(summary_text)
             except json.JSONDecodeError:
-                # If parsing fails, fill with None values
                 summary = {
                     "direction": None,
                     "entry": None,
@@ -77,18 +63,37 @@ def summarize_trading_setups():
                     "stop_loss_pips": None,
                     "take_profit_pips": None,
                 }
+            summary["filename"] = os.path.splitext(filename)[0]
+            directions.add(summary.get("direction"))
+            summaries.append(summary)
+
+        if len(directions) == 1:
+            sheet = workbook.create_sheet(title=symbol)
             sheet.append(
                 [
-                    os.path.splitext(filename)[0],
-                    summary.get("direction"),
-                    summary.get("entry"),
-                    summary.get("stop_loss"),
-                    summary.get("take_profit"),
-                    summary.get("rrr"),
-                    summary.get("stop_loss_pips"),
-                    summary.get("take_profit_pips"),
+                    "Filename",
+                    "Direction",
+                    "Entry",
+                    "Stop Loss",
+                    "Take Profit",
+                    "RRR",
+                    "Stop Loss Pips",
+                    "Take Profit Pips",
                 ]
             )
+            for summary in summaries:
+                sheet.append(
+                    [
+                        summary.get("filename"),
+                        summary.get("direction"),
+                        summary.get("entry"),
+                        summary.get("stop_loss"),
+                        summary.get("take_profit"),
+                        summary.get("rrr"),
+                        summary.get("stop_loss_pips"),
+                        summary.get("take_profit_pips"),
+                    ]
+                )
 
     # Apply formatting to all sheets after processing
     for sheet in workbook.worksheets:

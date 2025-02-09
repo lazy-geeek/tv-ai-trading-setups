@@ -39,7 +39,7 @@ Calculate these values:
 - Stop loss pips (number)
 - Take profit pips (number)
 
-If there is no clear trading setup, return "None" as direction and zero for all numbers.
+If there is no clear trading setup with given entry, stop loss and take profit, return "None" as direction and zero for all numbers.
 
 Return ONLY as JSON format with keys: direction, entry, stop_loss, take_profit, rrr, stop_loss_pips, take_profit_pips
 No further comments in your response, only JSON.
