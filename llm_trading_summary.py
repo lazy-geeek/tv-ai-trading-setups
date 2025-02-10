@@ -95,6 +95,10 @@ def summarize_trading_setups():
                     ]
                 )
 
+    if len(workbook.worksheets) == 0:
+        print_status("No valid trading summaries found. Excel file not generated.")
+        return
+
     # Apply formatting to all sheets after processing
     for sheet in workbook.worksheets:
         # Bold header row cells

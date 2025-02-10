@@ -45,17 +45,18 @@ def generate_trading_setups():
             )
             continue
 
-        print_status("Get ChatGPT trading setup...")
-        chatgpt_setup = get_chatgpt_trading_setup(screenshot_files)
-        save_trading_setup_to_file(symbol, chatgpt_setup, "chatgpt")
+        with tqdm(total=3, desc="Generating setups", leave=False) as pbar:
+            chatgpt_setup = get_chatgpt_trading_setup(screenshot_files)
+            save_trading_setup_to_file(symbol, chatgpt_setup, "chatgpt")
+            pbar.update(1)
 
-        print_status("Get Gemini trading setup...")
-        gemini_setup = get_gemini_trading_setup(screenshot_files)
-        save_trading_setup_to_file(symbol, gemini_setup, "gemini")
+            gemini_setup = get_gemini_trading_setup(screenshot_files)
+            save_trading_setup_to_file(symbol, gemini_setup, "gemini")
+            pbar.update(1)
 
-        print_status("Get Anthropic trading setup...")
-        anthropic_setup = get_anthropic_trading_setup(screenshot_files)
-        save_trading_setup_to_file(symbol, anthropic_setup, "claude")
+            anthropic_setup = get_anthropic_trading_setup(screenshot_files)
+            save_trading_setup_to_file(symbol, anthropic_setup, "claude")
+            pbar.update(1)
 
 
 def openai_message_content(screenshot_files):
