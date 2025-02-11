@@ -4,7 +4,7 @@ import os
 from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
-from groq import Groq
+from openai import OpenAI
 from decouple import config
 import time
 from datetime import datetime
@@ -17,12 +17,12 @@ from helper_func import (
 from llm_prompts import SUMMARY_SYSTEM_PROMPT
 from tqdm import tqdm
 
-openai_model = config("EXTRACTION_MODEL")
-openai_api_key = config("OPENAI_API_KEY")
-groq_model = config("GROQ_MODEL")
-
 symbols = json.loads(config("SYMBOLS"))
 download_directory = get_download_directory()
+
+model = config("OPEN_ROUTER_SUMMARY_MODEL")
+api_key = config("OPEN_ROUTER_API_KEY")
+base_url = "https://openrouter.ai/api/v1"
 
 
 def summarize_trading_setups():
@@ -34,7 +34,7 @@ def summarize_trading_setups():
     default_sheet = workbook.active
     workbook.remove(default_sheet)
 
-    client = Groq(api_key=config("GROQ_API_KEY"))
+    client = OpenAI(api_key=api_key, base_url=base_url)
 
     for symbol in tqdm(symbols, desc="Processing symbols"):
         directory = get_trading_setups_directory(symbol)
@@ -46,16 +46,23 @@ def summarize_trading_setups():
             with open(file_path, "r", encoding="utf-8") as f:
                 text = f.read()
             response = client.chat.completions.create(
-                model=groq_model,
+                model=model,
                 messages=[
                     {"role": "system", "content": SUMMARY_SYSTEM_PROMPT},
                     {"role": "user", "content": text},
                 ],
             )
-            summary_text = response.choices[0].message.content
+            if isinstance(response, str):
+                print(f"OpenRouter API Error: {response}")
+                summary_text = ""
+            else:
+                summary_text = response.choices[0].message.content
+            # Remove code block delimiters
+            summary_text = summary_text.replace("```json", "").replace("```", "")
             try:
                 summary = json.loads(summary_text)
-            except json.JSONDecodeError:
+            except json.JSONDecodeError as e:
+                print(f"JSONDecodeError: {e}")  # Add logging
                 summary = {
                     "direction": None,
                     "entry": None,
@@ -68,7 +75,6 @@ def summarize_trading_setups():
             summary["filename"] = os.path.splitext(filename)[0]
             directions.add(summary.get("direction"))
             summaries.append(summary)
-            time.sleep(5)
 
         if len(directions) == 1:
             sheet = workbook.create_sheet(title=symbol)
