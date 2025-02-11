@@ -4,7 +4,7 @@ import os
 from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
-from openai import OpenAI
+from groq import Groq
 from decouple import config
 from datetime import datetime
 
@@ -18,6 +18,7 @@ from tqdm import tqdm
 
 openai_model = config("EXTRACTION_MODEL")
 openai_api_key = config("OPENAI_API_KEY")
+groq_model = config("GROQ_MODEL")
 
 symbols = json.loads(config("SYMBOLS"))
 download_directory = get_download_directory()
@@ -32,7 +33,7 @@ def summarize_trading_setups():
     default_sheet = workbook.active
     workbook.remove(default_sheet)
 
-    client = OpenAI(api_key=openai_api_key)
+    client = Groq(api_key=config("GROQ_API_KEY"))
 
     for symbol in tqdm(symbols, desc="Processing symbols"):
         directory = get_trading_setups_directory(symbol)
@@ -44,7 +45,7 @@ def summarize_trading_setups():
             with open(file_path, "r", encoding="utf-8") as f:
                 text = f.read()
             response = client.chat.completions.create(
-                model=openai_model,
+                model=groq_model,
                 messages=[
                     {"role": "system", "content": SUMMARY_SYSTEM_PROMPT},
                     {"role": "user", "content": text},
