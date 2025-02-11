@@ -3,6 +3,7 @@ import shutil
 
 from datetime import datetime
 from decouple import config
+from werkzeug.utils import secure_filename
 
 
 def print_status(status):
@@ -46,7 +47,8 @@ def save_trading_setup_to_file(symbol, trading_setup, file_name):
 
     trading_setups_dir = get_trading_setups_directory(symbol)
 
-    file_path = os.path.join(trading_setups_dir, file_name + ".txt")
+    safe_file_name = secure_filename(file_name)
+    file_path = os.path.join(trading_setups_dir, safe_file_name + ".txt")
     with open(file_path, "w", encoding="utf-8") as file:
         file.write(trading_setup)
 

@@ -23,6 +23,9 @@ deepseek_base_url = "https://api.deepseek.com/"
 gemini_api_key = config("GEMINI_API_KEY")
 gemini_model = config("GEMINI_MODEL")
 gemini_base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
+openrouter_api_key = config("OPEN_ROUTER_API_KEY")
+openrouter_model = config("OPEN_ROUTER_MODEL")
+openrouter_base_url = "https://openrouter.ai/api/v1"
 anthropic_model = config("ANTHROPIC_MODEL")
 anthropic_api_key = config("ANTHROPIC_API_KEY")
 
@@ -47,15 +50,21 @@ def generate_trading_setups():
 
         with tqdm(total=3, desc="Generating setups", leave=False) as pbar:
             chatgpt_setup = get_chatgpt_trading_setup(screenshot_files)
-            save_trading_setup_to_file(symbol, chatgpt_setup, "chatgpt")
+            save_trading_setup_to_file(symbol, chatgpt_setup, openai_model)
             pbar.update(1)
 
             gemini_setup = get_gemini_trading_setup(screenshot_files)
-            save_trading_setup_to_file(symbol, gemini_setup, "gemini")
+            save_trading_setup_to_file(symbol, gemini_setup, gemini_model)
             pbar.update(1)
 
+            """
             anthropic_setup = get_anthropic_trading_setup(screenshot_files)
-            save_trading_setup_to_file(symbol, anthropic_setup, "claude")
+            save_trading_setup_to_file(symbol, anthropic_setup, anthropic_model)
+            pbar.update(1)
+            """
+
+            openrouter_setup = get_openrouter_trading_setup(screenshot_files)
+            save_trading_setup_to_file(symbol, openrouter_setup, openrouter_model)
             pbar.update(1)
 
 
@@ -165,4 +174,13 @@ def get_chatgpt_trading_setup(screenshot_files):
 def get_gemini_trading_setup(screenshot_files):
     return get_openai_trading_setup(
         gemini_api_key, gemini_base_url, gemini_model, screenshot_files
+    )
+
+
+def get_openrouter_trading_setup(screenshot_files):
+    return get_openai_trading_setup(
+        openrouter_api_key,
+        openrouter_base_url,
+        openrouter_model,
+        screenshot_files,
     )
