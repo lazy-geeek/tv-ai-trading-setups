@@ -6,6 +6,7 @@ from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 from groq import Groq
 from decouple import config
+import time
 from datetime import datetime
 
 from helper_func import (
@@ -67,6 +68,7 @@ def summarize_trading_setups():
             summary["filename"] = os.path.splitext(filename)[0]
             directions.add(summary.get("direction"))
             summaries.append(summary)
+            time.sleep(5)
 
         if len(directions) == 1:
             sheet = workbook.create_sheet(title=symbol)
