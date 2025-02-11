@@ -3,12 +3,13 @@ TRADING_USER_PROMPT = """
 Analyze the provided forex candlestick charts as if you are an advanced quantitative strategist at a Tier 1 prop firm. Develop a high-probability profitable trading setup using the following:
 
 • Examine all timeframes from provided screeenshots.
+• In the chart there is a 20 ema (blue), 50 ema (orange) and 200 sma (lime green)
 • Identify the overall market structure (uptrend, downtrend, or range) across these timeframes.
-• Use any relevant indicators or tools (e.g., moving averages, RSI, MACD, Bollinger Bands, Ichimoku Cloud).
+• Use the provided indicators in the charts.
 • Identify important support/resistance levels, supply/demand zones, pivot points, Fibonacci retracements or extensions and psychological round numbers.
 • Identify any emerging or established chart patterns (e.g., triangles, head & shoulders, harmonic patterns, etc).
 • Include significant price action signals (pin bars, engulfing candles, dojis, etc) and what they might indicate about future movement.
-• Assess underlying order blocks, supply/demand imbalances, or liquidity zones visible on the chart.
+• Assess underlying order blocks, supply/demand imbalances, or liquidity zones in the charts.
 • Assess volume spikes or momentum shifts if applicable.
 • Determine if there is any evidence of smart money concepts (e.g., stop hunts, institutional “fakeouts,” or springboard entries).
 • Recommend a direction (long or short) with clear justification.
