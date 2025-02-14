@@ -1,9 +1,9 @@
-TRADING_SYSTEM_PROMPT = "You are an expert in analyzing screenshots of candlestick charts and proposing successful trading setups for great profits."
+TRADING_SYSTEM_PROMPT = "You are an expert in analyzing screenshots of candlestick charts and proposing successful breakout trading setups for great profits."
 TRADING_USER_PROMPT = """
-Analyze the provided forex candlestick charts as if you are an advanced quantitative strategist at a Tier 1 prop firm. Develop a high-probability profitable trading setup using the following:
+Analyze the provided forex candlestick charts as if you are an advanced quantitative strategist at a Tier 1 prop firm. Develop a high-probability profitable breakout trading setup using the following:
 
-• Examine all timeframes from provided screeenshots.
-• In the chart there is a 20 ema (blue), 50 ema (orange) and 200 sma (lime green)
+• Examine all timeframes from the provided screeenshots.
+• In all charts, there are visual graphical technical indicators to help you.
 • Identify the overall market structure (uptrend, downtrend, or range) across these timeframes.
 • Use the provided indicators in the charts.
 • Identify important support/resistance levels, supply/demand zones, pivot points, Fibonacci retracements or extensions and psychological round numbers.
@@ -14,19 +14,19 @@ Analyze the provided forex candlestick charts as if you are an advanced quantita
 • Determine if there is any evidence of smart money concepts (e.g., stop hunts, institutional “fakeouts,” or springboard entries).
 • Recommend a direction (long or short) with clear justification.
 • Use pending orders at specific price levels (e.g., buy limit, sell stop).
-• Stop-loss placement (exact level), explained by key technical zones or volatility considerations.
-• Take-profit target, justified by major support/resistance, Fibonacci levels or target the next liquidity pool
-• The Risk/Reward ratio must at least be 1:2.
+• Stop-loss placement (exact level)
+• Take-profit target (exact level)
+• The Risk/Reward ratio must at least be 1:2
 
 Example Output Format:
 
 Instrument: GBPUSD 
 Direction: Short
-Entry: 1.2750 (break of 1H order block after liquidity sweep at 1.2780)
-Stop Loss: 1.2810 (above daily swing high + 1.5x ATR)
-Take Profit: 1.2650 (daily FVG fill + 1.618 Fib extension)
+Entry: 1.2750
+Stop Loss: 1.2810
+Take Profit: 1.2650
 
-Don't recommend a trading setup if the current market situation is not clear enough or the minimum risk reward ratio can not be fulfilled.
+Don't recommend a trading setup if the current market situation is unclear, you can not find a possible breakout setup or the minimum risk reward ratio of 1:2 can not be fulfilled.
 """
 
 SUMMARY_SYSTEM_PROMPT = """Extract these values from the text:
@@ -42,7 +42,7 @@ Calculate these values:
 
 If there is no clear trading setup or multiple trading setups with given entry, stop loss and take profit, set "None" as direction and zero for all numbers.
 
-Return ONLY as JSON format with keys: direction, entry, stop_loss, take_profit, rrr, stop_loss_pips, take_profit_pips
-No further comments in your response, only JSON.
+Return ONLY as JSON format with the following keys: direction, entry, stop_loss, take_profit, rrr, stop_loss_pips, take_profit_pips
+No further comments or code block delimiters in your response, only plain JSON.
 """
 SUMMARY_USER_PROMPT = "."
