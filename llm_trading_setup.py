@@ -48,7 +48,7 @@ def generate_trading_setups():
             )
             continue
 
-        with tqdm(total=4, desc="Generating setups", leave=False) as pbar:
+        with tqdm(total=3, desc="Generating setups", leave=False) as pbar:
             chatgpt_setup = get_chatgpt_trading_setup(screenshot_files)
             save_trading_setup_to_file(symbol, chatgpt_setup, openai_model)
             pbar.update(1)
@@ -64,12 +64,6 @@ def generate_trading_setups():
                 screenshot_files,
             )
             save_trading_setup_to_file(symbol, anthropic_setup, anthropic_model)
-            pbar.update(1)
-
-            grok_setup = get_openai_trading_setup(
-                openrouter_api_key, openrouter_base_url, grok_model, screenshot_files
-            )
-            save_trading_setup_to_file(symbol, grok_setup, grok_model)
             pbar.update(1)
 
 

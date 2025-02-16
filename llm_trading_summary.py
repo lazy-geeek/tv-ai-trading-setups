@@ -76,8 +76,7 @@ def summarize_trading_setups():
             directions.add(summary.get("direction"))
             summaries.append(summary)
 
-        # if len(directions) == 1 and "None" not in directions:
-        if True:
+        if len(directions) == 1 and "None" not in directions:
             sheet = workbook.create_sheet(title=symbol)
             sheet.append(
                 [
