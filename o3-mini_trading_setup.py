@@ -12,9 +12,10 @@ from pprint import pprint
 from llm_prompts import *
 from helper_func import print_status, save_trading_setup_to_file, get_symbol_directory
 
-symbols = json.loads(config("SYMBOLS"))
+symbols = ["EURUSD"]
+o3_model = "openai/o3-mini"
 
-openai_model = config("OPENAI_MODEL")
+openai_model = "o3-mini"
 openai_api_key = config("OPENAI_API_KEY")
 openai_base_url = "https://api.openai.com/v1/"
 
@@ -48,22 +49,14 @@ def generate_trading_setups():
             )
             continue
 
-        with tqdm(total=3, desc=f"Generating setups {symbol}", leave=False) as pbar:
-            chatgpt_setup = get_chatgpt_trading_setup(screenshot_files)
-            save_trading_setup_to_file(symbol, chatgpt_setup, openai_model)
-            pbar.update(1)
-
-            gemini_setup = get_gemini_trading_setup(screenshot_files)
-            save_trading_setup_to_file(symbol, gemini_setup, gemini_model)
-            pbar.update(1)
-
-            anthropic_setup = get_openai_trading_setup(
+        with tqdm(total=1, desc="Generating setups", leave=False) as pbar:
+            o3_setup = get_openai_trading_setup(
                 openrouter_api_key,
                 openrouter_base_url,
-                anthropic_model,
+                o3_model,
                 screenshot_files,
             )
-            save_trading_setup_to_file(symbol, anthropic_setup, anthropic_model)
+            save_trading_setup_to_file(symbol, o3_setup, o3_model)
             pbar.update(1)
 
 
@@ -122,3 +115,6 @@ def get_gemini_trading_setup(screenshot_files):
     return get_openai_trading_setup(
         gemini_api_key, gemini_base_url, gemini_model, screenshot_files
     )
+
+
+generate_trading_setups()

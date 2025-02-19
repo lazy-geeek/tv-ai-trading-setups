@@ -1,6 +1,6 @@
-TRADING_SYSTEM_PROMPT = "You are an expert in analyzing screenshots of candlestick charts and proposing successful breakout trading setups for great profits."
+TRADING_SYSTEM_PROMPT = "You are an expert in analyzing screenshots of candlestick charts and proposing successful scalping breakout trading setups for great profits."
 TRADING_USER_PROMPT = """
-Analyze the provided forex candlestick charts as if you are an advanced quantitative strategist at a Tier 1 prop firm. Develop a high-probability profitable breakout trading setup using the following:
+Analyze the provided forex candlestick charts as if you are an advanced quantitative strategist at a Tier 1 prop firm. Develop a high-probability profitable scalping breakout trading setup using the following:
 
 • Examine all timeframes from the provided screeenshots.
 • In all charts, there are visual graphical technical indicators to help you.
@@ -17,16 +17,15 @@ Analyze the provided forex candlestick charts as if you are an advanced quantita
 • Stop-loss placement (exact level)
 • Take-profit target (exact level)
 • The Risk/Reward ratio must at least be 1:2
+• Do not recommend a trading setup if the current market situation is unclear, you can not find a possible scalping breakout setup or the minimum risk reward ratio of 1:2 can not be fulfilled and respond why you think you could not find a profitable setup.
 
-Example Output Format:
+Example Output Format for profitable setup:
 
 Instrument: GBPUSD 
 Direction: Short
 Entry: 1.2750
 Stop Loss: 1.2810
 Take Profit: 1.2650
-
-Don't recommend a trading setup if the current market situation is unclear, you can not find a possible breakout setup or the minimum risk reward ratio of 1:2 can not be fulfilled.
 """
 
 SUMMARY_SYSTEM_PROMPT = """Extract these values from the text:
