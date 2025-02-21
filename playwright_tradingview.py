@@ -13,6 +13,7 @@ from helper_func import (
 
 endpoint_url = config("ENDPOINT_URL")
 website_url = config("WEBSITE_URL")
+tf_reload_timeout = int(config("TF_RELOAD_TIMEOUT"))
 chart_reload_timeout = int(config("CHART_RELOAD_TIMEOUT"))
 timeframes = json.loads(config("TIMEFRAMES"))
 symbols = json.loads(config("SYMBOLS"))
@@ -44,9 +45,9 @@ def take_tradingview_screenshots():
             download_directory = get_symbol_directory(symbol)
 
             page.keyboard.type(symbol)
-            page.wait_for_timeout(chart_reload_timeout)
+            page.wait_for_timeout(tf_reload_timeout)
             page.keyboard.press("Enter")
-            page.wait_for_timeout(chart_reload_timeout)
+            page.wait_for_timeout(tf_reload_timeout)
 
             # Loop through timeframes for the current symbol with a progress bar
             for timeframe in tqdm(
@@ -54,7 +55,7 @@ def take_tradingview_screenshots():
             ):
                 # Change timeframe by typing
                 page.keyboard.type(timeframe)
-                page.wait_for_timeout(chart_reload_timeout)
+                page.wait_for_timeout(tf_reload_timeout)
                 page.keyboard.press("Enter")
                 page.wait_for_timeout(chart_reload_timeout)
 
