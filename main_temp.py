@@ -1,7 +1,7 @@
 import playwright_tradingview
-import gemini_trading_setup
+import litellm_trading_setup
 import llm_trading_summary
 
 # playwright_tradingview.take_tradingview_screenshots()
-gemini_trading_setup.generate_trading_setups()
-llm_trading_summary.summarize_trading_setups()
+litellm_trading_setup.generate_trading_setups()
+# llm_trading_summary.summarize_trading_setups()
