@@ -22,7 +22,7 @@ gemini_api_key = config("GEMINI_API_KEY")
 gemini_model = "google/gemini-2.0-flash-thinking-exp:free"
 gemini_base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
 
-openrouter_api_key = config("OPEN_ROUTER_API_KEY")
+openrouter_api_key = config("OPENROUTER_API_KEY")
 openrouter_base_url = "https://openrouter.ai/api/v1"
 
 anthropic_model = config("ANTHROPIC_MODEL")

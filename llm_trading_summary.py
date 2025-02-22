@@ -21,7 +21,7 @@ symbols = json.loads(config("SYMBOLS"))
 download_directory = get_download_directory()
 
 model = config("SUMMARY_MODEL")
-api_key = config("OPEN_ROUTER_API_KEY")
+api_key = config("OPENROUTER_API_KEY")
 base_url = "https://openrouter.ai/api/v1"
 
 
