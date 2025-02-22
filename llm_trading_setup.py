@@ -4,7 +4,6 @@ import json
 
 from glob import glob
 from openai import OpenAI
-from anthropic import Anthropic
 from decouple import config
 from tqdm import tqdm
 from pprint import pprint
