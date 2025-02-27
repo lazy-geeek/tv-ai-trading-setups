@@ -247,66 +247,75 @@ def summarize_setups_for_symbol(symbol):
 def save_summaries_to_excel_for_symbol(symbol, summaries):
     print_status(f"Saving summaries to Excel for {symbol}...")
 
-    workbook = Workbook()
-    # Remove the default sheet created by Workbook
-    default_sheet = workbook.active
-    workbook.remove(default_sheet)
+    directions = [summary.get("direction") for summary in summaries]
+    unique_directions = set(directions)
 
-    sheet = workbook.create_sheet(title=symbol)
-    sheet.append(
-        [
-            "Filename",
-            "Direction",
-            "Entry",
-            "Stop Loss",
-            "Take Profit",
-            "RRR",
-            "Stop Loss Pips",
-            "Take Profit Pips",
-        ]
-    )
-    for summary in summaries:
+    # Check if all directions are the same and not all are "None"
+    if len(unique_directions) == 1 and "None" not in unique_directions:
+        workbook = Workbook()
+        # Remove the default sheet created by Workbook
+        default_sheet = workbook.active
+        workbook.remove(default_sheet)
+
+        sheet = workbook.create_sheet(title=symbol)
         sheet.append(
             [
-                summary.get("filename"),
-                summary.get("direction"),
-                summary.get("entry"),
-                summary.get("stop_loss"),
-                summary.get("take_profit"),
-                summary.get("rrr"),
-                summary.get("stop_loss_pips"),
-                summary.get("take_profit_pips"),
+                "Filename",
+                "Direction",
+                "Entry",
+                "Stop Loss",
+                "Take Profit",
+                "RRR",
+                "Stop Loss Pips",
+                "Take Profit Pips",
             ]
         )
+        for summary in summaries:
+            sheet.append(
+                [
+                    summary.get("filename"),
+                    summary.get("direction"),
+                    summary.get("entry"),
+                    summary.get("stop_loss"),
+                    summary.get("take_profit"),
+                    summary.get("rrr"),
+                    summary.get("stop_loss_pips"),
+                    summary.get("take_profit_pips"),
+                ]
+            )
 
-    # Apply formatting to the sheet
-    # Bold header row cells
-    for cell in sheet[1]:
-        cell.font = Font(bold=True)
-    # Bold first column cells
-    for row in sheet.iter_rows(min_col=1, max_col=1):
-        for cell in row:
+        # Apply formatting to the sheet
+        # Bold header row cells
+        for cell in sheet[1]:
             cell.font = Font(bold=True)
-    # Auto-size columns
-    for col in sheet.columns:
-        max_length = 0
-        col_letter = get_column_letter(col[0].column)
-        for cell in col:
-            if cell.value:
-                cell_length = len(str(cell.value))
-                if cell_length > max_length:
-                    max_length = cell_length
-        adjusted_width = max_length + 2
-        sheet.column_dimensions[col_letter].width = adjusted_width
+        # Bold first column cells
+        for row in sheet.iter_rows(min_col=1, max_col=1):
+            for cell in row:
+                cell.font = Font(bold=True)
+        # Auto-size columns
+        for col in sheet.columns:
+            max_length = 0
+            col_letter = get_column_letter(col[0].column)
+            for cell in col:
+                if cell.value:
+                    cell_length = len(str(cell.value))
+                    if cell_length > max_length:
+                        max_length = cell_length
+            adjusted_width = max_length + 2
+            sheet.column_dimensions[col_letter].width = adjusted_width
 
-    download_directory = get_download_directory()
-    timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M")
-    filename = f"{symbol}_trading_summaries-{timestamp}.xlsx"
-    save_path = os.path.join(download_directory, filename)
-    if os.path.exists(save_path):
-        os.remove(save_path)
-    workbook.save(save_path)
-    print_status(f"Summaries written to {save_path}")
+        download_directory = get_download_directory()
+        timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M")
+        filename = f"{symbol}_trading_summaries-{timestamp}.xlsx"
+        save_path = os.path.join(download_directory, filename)
+        if os.path.exists(save_path):
+            os.remove(save_path)
+        workbook.save(save_path)
+        print_status(f"Summaries written to {save_path}")
+    else:
+        print_status(
+            f"Skipping Excel creation for {symbol} because directions are not uniform or contain 'None'."
+        )
 
 
 # --- Main Function ---
