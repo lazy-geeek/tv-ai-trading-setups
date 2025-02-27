@@ -51,51 +51,32 @@ summary_model = config("SUMMARY_MODEL")
 
 
 # --- Screenshot Functionality ---
-def take_screenshots_for_symbol(symbol):
+def take_screenshots_for_symbol(symbol, page):
     print_status(f"Taking Tradingview screenshots for {symbol}...")
 
-    with sync_playwright() as p:
-        # Connect to the existing browser instance
-        browser = p.chromium.connect_over_cdp(endpoint_url)
+    download_directory = get_symbol_directory(symbol)
 
-        # Get the default browser context (this will use the existing user profile)
-        context = browser.contexts[0]
+    page.keyboard.type(symbol)
+    page.wait_for_timeout(tf_reload_timeout)
+    page.keyboard.press("Enter")
+    page.wait_for_timeout(tf_reload_timeout)
 
-        # Create a new page in the existing context
-        page = context.new_page()
-        page.set_default_timeout(10000)
-
-        # Navigate to a website (it should already be logged in)
-        page.goto(website_url)
-
-        download_directory = get_symbol_directory(symbol)
-
-        page.keyboard.type(symbol)
+    # Loop through timeframes for the current symbol with a progress bar
+    for timeframe in tqdm(timeframes, desc=f"Timeframes for {symbol}", leave=False):
+        # Change timeframe by typing
+        page.keyboard.type(timeframe)
         page.wait_for_timeout(tf_reload_timeout)
         page.keyboard.press("Enter")
-        page.wait_for_timeout(tf_reload_timeout)
+        page.wait_for_timeout(chart_reload_timeout)
 
-        # Loop through timeframes for the current symbol with a progress bar
-        for timeframe in tqdm(timeframes, desc=f"Timeframes for {symbol}", leave=False):
-            # Change timeframe by typing
-            page.keyboard.type(timeframe)
-            page.wait_for_timeout(tf_reload_timeout)
-            page.keyboard.press("Enter")
-            page.wait_for_timeout(chart_reload_timeout)
+        # Download screenshot
+        with page.expect_download() as download_info:
+            page.keyboard.press("Control+Alt+S")
 
-            # Download screenshot
-            with page.expect_download() as download_info:
-                page.keyboard.press("Control+Alt+S")
+        download = download_info.value
 
-            download = download_info.value
-
-            # Wait for the download process to complete and save the downloaded file in specified path
-            download.save_as(
-                os.path.join(download_directory, download.suggested_filename)
-            )
-
-        # Close page
-        page.close()
+        # Wait for the download process to complete and save the downloaded file in specified path
+        download.save_as(os.path.join(download_directory, download.suggested_filename))
 
     print_status(f"Screenshots completed for {symbol}!")
 
@@ -325,15 +306,32 @@ def main():
     # Delete all files from download directory
     clear_download_directory()
 
-    for symbol in tqdm(symbols, desc="Processing Symbols"):
-        print_status(f"Starting process for symbol: {symbol}")
+    with sync_playwright() as p:
+        # Connect to the existing browser instance
+        browser = p.chromium.connect_over_cdp(endpoint_url)
 
-        take_screenshots_for_symbol(symbol)
-        generate_setups_for_symbol(symbol)
-        summaries = summarize_setups_for_symbol(symbol)
-        save_summaries_to_excel_for_symbol(symbol, summaries)
+        # Get the default browser context (this will use the existing user profile)
+        context = browser.contexts[0]
 
-        print_status(f"Completed process for symbol: {symbol}")
+        # Create a new page in the existing context
+        page = context.new_page()
+        page.set_default_timeout(10000)
+
+        # Navigate to a website (it should already be logged in)
+        page.goto(website_url)
+
+        for symbol in tqdm(symbols, desc="Processing Symbols"):
+            print_status(f"Starting process for symbol: {symbol}")
+
+            take_screenshots_for_symbol(symbol, page)
+            generate_setups_for_symbol(symbol)
+            summaries = summarize_setups_for_symbol(symbol)
+            save_summaries_to_excel_for_symbol(symbol, summaries)
+
+            print_status(f"Completed process for symbol: {symbol}")
+
+        # Close the page after processing all symbols
+        page.close()
 
     print_status("Main process completed!")
 
