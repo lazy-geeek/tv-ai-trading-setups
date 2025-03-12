@@ -1,4 +1,4 @@
-TRADING_SYSTEM_PROMPT = "You are an expert in analyzing screenshots of candlestick charts and finding successful profitable trading setups for great profits."
+TRADING_SYSTEM_PROMPT = "You are the expert in analyzing screenshots of candlestick charts and finding successful profitable trading setups for great profits."
 TRADING_USER_PROMPT = """
 Analyze the provided forex candlestick charts as if you are an advanced quantitative strategist at a Tier 1 prop firm. Develop a high-probability successful profitable trading setup using the following:
 
@@ -17,8 +17,8 @@ Analyze the provided forex candlestick charts as if you are an advanced quantita
 • Stop-loss placement (exact level)
 • Take-profit target (exact level)
 • The minimum Risk/Reward ratio must be at least 1:2
-• The minimum stop loss must be at least 20 pips
-• Do not recommend a trading setup if the current market situation is unclear, you can not find a successful profitable setup or the minimum risk reward ratio and minimum stop loss can not be fulfilled and respond why you think you could not find a profitable setup.
+• Use a reasonable safe stop loss for the trading setup. 
+• Do not recommend a trading setup if the current market situation is unclear, you can not find a successful profitable setup or the minimum risk reward ratio can not be fulfilled and respond why you think you could not find a profitable setup.
 
 Required Output Format for profitable setup:
 
