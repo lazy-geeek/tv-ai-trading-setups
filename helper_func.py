@@ -3,13 +3,14 @@ import shutil
 
 from datetime import datetime
 from decouple import config
+from tqdm import tqdm
 from werkzeug.utils import secure_filename
 
 
 def print_status(status):
     now = datetime.now()
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
-    print(f"[{timestamp}]: {status}")
+    tqdm.write(f"[{timestamp}]: {status}")
 
 
 def get_download_directory():

@@ -52,7 +52,7 @@ summary_model = config("SUMMARY_MODEL")
 
 # --- Screenshot Functionality ---
 def take_screenshots_for_symbol(symbol, page):
-    print_status(f"Taking Tradingview screenshots for {symbol}...")
+    # print_status(f"Taking Tradingview screenshots for {symbol}...")
 
     download_directory = get_symbol_directory(symbol)
 
@@ -78,12 +78,12 @@ def take_screenshots_for_symbol(symbol, page):
         # Wait for the download process to complete and save the downloaded file in specified path
         download.save_as(os.path.join(download_directory, download.suggested_filename))
 
-    print_status(f"Screenshots completed for {symbol}!")
+    # print_status(f"Screenshots completed for {symbol}!") # Removed to fix progress bar
 
 
 # --- Trading Setup Generation Functionality ---
 def generate_setups_for_symbol(symbol):
-    print_status(f"Generating trading setups for {symbol}...")
+    # print_status(f"Generating trading setups for {symbol}...") # Removed to fix progress bar
 
     symbol_dir = get_symbol_directory(symbol)
 
@@ -175,7 +175,7 @@ def get_gemini_trading_setup(screenshot_files):
 
 # --- Summary Generation Functionality ---
 def summarize_setups_for_symbol(symbol):
-    print_status(f"Summarizing trading setups for {symbol}...")
+    # print_status(f"Summarizing trading setups for {symbol}...")
 
     client = OpenAI(api_key=openrouter_api_key, base_url=openrouter_base_url)
 
@@ -226,7 +226,7 @@ def summarize_setups_for_symbol(symbol):
 
 # --- Excel Export Functionality ---
 def save_summaries_to_excel_for_symbol(symbol, summaries):
-    print_status(f"Saving summaries to Excel for {symbol}...")
+    # print_status(f"Saving summaries to Excel for {symbol}...") # Removed to fix progress bar
 
     directions = [summary.get("direction") for summary in summaries]
     unique_directions = set(directions)
@@ -292,11 +292,7 @@ def save_summaries_to_excel_for_symbol(symbol, summaries):
         if os.path.exists(save_path):
             os.remove(save_path)
         workbook.save(save_path)
-        print_status(f"Summaries written to {save_path}")
-    else:
-        print_status(
-            f"Skipping Excel creation for {symbol} because directions are not uniform or contain 'None'."
-        )
+        # print_status(f"Summaries written to {save_path}")
 
 
 # --- Main Function ---
@@ -321,14 +317,14 @@ def main():
         page.goto(website_url)
 
         for symbol in tqdm(symbols, desc="Processing Symbols"):
-            print_status(f"Starting process for symbol: {symbol}")
+            # print_status(f"Starting process for symbol: {symbol}") # Removed to fix progress bar
 
             take_screenshots_for_symbol(symbol, page)
             generate_setups_for_symbol(symbol)
             summaries = summarize_setups_for_symbol(symbol)
             save_summaries_to_excel_for_symbol(symbol, summaries)
 
-            print_status(f"Completed process for symbol: {symbol}")
+            # print_status(f"Completed process for symbol: {symbol}")
 
         # Close the page after processing all symbols
         page.close()
