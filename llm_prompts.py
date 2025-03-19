@@ -18,7 +18,7 @@ Analyze the provided forex candlestick charts as if you are an advanced quantita
 • Take-profit target (exact level)
 • The minimum Risk/Reward ratio must be at least 1:2
 • Use a reasonable safe stop loss for the trading setup. 
-• Do not recommend a trading setup if the current market situation is unclear, you can not find a successful profitable setup or the minimum risk reward ratio can not be fulfilled and respond why you think you could not find a profitable setup.
+• Do not recommend a trading setup if the current market situation is unclear, you can not find a successful profitable setup or the minimum risk reward ratio can not be fulfilled and respond why you think you could not find a profitable setup - be honest.
 
 Required Output Format for profitable setup:
 
