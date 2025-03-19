@@ -72,7 +72,6 @@ tv-ai-trading-setups/
 ├── main_new.py             # Main execution script
 ├── helper_func.py          # Directory management utilities
 ├── llm_prompts.py          # AI prompt templates
-├── playwright_tradingview.py # Browser automation helpers
 └── poetry.lock             # Dependency lock file
 ```
 
