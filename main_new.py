@@ -227,6 +227,7 @@ def summarize_setups_for_symbol(symbol):
 # --- Excel Export Functionality ---
 def save_summaries_to_excel_for_symbol(symbol, summaries):
     # print_status(f"Saving summaries to Excel for {symbol}...") # Removed to fix progress bar
+    symbol = symbol.split(":")[1]
 
     directions = [summary.get("direction") for summary in summaries]
     unique_directions = set(directions)

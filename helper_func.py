@@ -23,6 +23,7 @@ def get_download_directory():
 
 def get_symbol_directory(symbol):
     base_dir = config("DOWNLOAD_DIRECTORY")
+    symbol = symbol.split(":")[1]
     safe_symbol = secure_filename(symbol)
     symbol_dir = os.path.join(base_dir, safe_symbol)
 
