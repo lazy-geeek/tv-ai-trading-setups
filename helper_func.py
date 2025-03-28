@@ -23,7 +23,8 @@ def get_download_directory():
 
 def get_symbol_directory(symbol):
     base_dir = config("DOWNLOAD_DIRECTORY")
-    symbol_dir = os.path.join(base_dir, symbol)
+    safe_symbol = secure_filename(symbol)
+    symbol_dir = os.path.join(base_dir, safe_symbol)
 
     check_if_directory_exists(symbol_dir)
 
@@ -31,8 +32,8 @@ def get_symbol_directory(symbol):
 
 
 def get_trading_setups_directory(symbol):
-    base_dir = config("DOWNLOAD_DIRECTORY")
-    trading_setup_dir = os.path.join(base_dir, symbol, "trading_setups")
+    base_dir = get_symbol_directory(symbol)
+    trading_setup_dir = os.path.join(base_dir, "trading_setups")
 
     check_if_directory_exists(trading_setup_dir)
 
