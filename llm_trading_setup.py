@@ -1,3 +1,5 @@
+"""Trading setup generation using OpenRouter LLMs only."""
+
 import base64
 import os
 import json
@@ -6,27 +8,26 @@ from glob import glob
 from openai import OpenAI
 from decouple import config
 from tqdm import tqdm
-from pprint import pprint
+
+# from pprint import pprint
 
 from llm_prompts import *
 from helper_func import print_status, save_trading_setup_to_file, get_symbol_directory
 
 symbols = json.loads(config("SYMBOLS"))
 
-openai_model = config("OPENAI_MODEL")
-openai_api_key = config("OPENAI_API_KEY")
-openai_base_url = "https://api.openai.com/v1/"
-
-gemini_api_key = config("GEMINI_API_KEY")
-gemini_model = config("GEMINI_MODEL")
-gemini_base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
-
 openrouter_api_key = config("OPENROUTER_API_KEY")
 openrouter_base_url = "https://openrouter.ai/api/v1"
 
-anthropic_model = config("ANTHROPIC_MODEL")
-
-grok_model = config("GROK_MODEL")
+# Load OpenRouter models from .env as a JSON list string
+try:
+    openrouter_models_raw = config("OPENROUTER_MODELS")
+    openrouter_models = json.loads(openrouter_models_raw)
+    if not isinstance(openrouter_models, list):
+        raise ValueError("OPENROUTER_MODELS is not a valid JSON list")
+except Exception as e:
+    print_status(f"Error loading or parsing OPENROUTER_MODELS from .env: {e}")
+    openrouter_models = []
 
 system_prompt = TRADING_SYSTEM_PROMPT
 user_prompt = TRADING_USER_PROMPT
@@ -47,23 +48,32 @@ def generate_trading_setups():
             )
             continue
 
-        with tqdm(total=3, desc=f"Generating setups {symbol}", leave=False) as pbar:
-            chatgpt_setup = get_chatgpt_trading_setup(screenshot_files)
-            save_trading_setup_to_file(symbol, chatgpt_setup, openai_model)
-            pbar.update(1)
-
-            gemini_setup = get_gemini_trading_setup(screenshot_files)
-            save_trading_setup_to_file(symbol, gemini_setup, gemini_model)
-            pbar.update(1)
-
-            anthropic_setup = get_openai_trading_setup(
-                openrouter_api_key,
-                openrouter_base_url,
-                anthropic_model,
-                screenshot_files,
+        if not openrouter_models:
+            print_status(
+                "No models found in OPENROUTER_MODELS. Skipping setup generation for this symbol."
             )
-            save_trading_setup_to_file(symbol, anthropic_setup, anthropic_model)
-            pbar.update(1)
+            continue
+
+        with tqdm(
+            total=len(openrouter_models),
+            desc=f"Generating setups {symbol}",
+            leave=False,
+        ) as pbar:
+            for model_name in openrouter_models:
+                print_status(f"Generating setup for {symbol} using model: {model_name}")
+                setup = get_openai_trading_setup(
+                    openrouter_api_key,
+                    openrouter_base_url,
+                    model_name,
+                    screenshot_files,
+                )
+                if setup:
+                    save_trading_setup_to_file(symbol, setup, model_name)
+                else:
+                    print_status(
+                        f"Failed to generate setup for {symbol} with model {model_name}"
+                    )
+                pbar.update(1)
 
 
 def openai_message_content(screenshot_files):
@@ -111,13 +121,4 @@ def get_openai_trading_setup(openai_api_key, openai_base_url, model, screenshot_
         return None
 
 
-def get_chatgpt_trading_setup(screenshot_files):
-    return get_openai_trading_setup(
-        openai_api_key, openai_base_url, openai_model, screenshot_files
-    )
-
-
-def get_gemini_trading_setup(screenshot_files):
-    return get_openai_trading_setup(
-        gemini_api_key, gemini_base_url, gemini_model, screenshot_files
-    )
+# All LLMs are now processed via OpenRouter using the models specified in OPENROUTER_MODELS.
