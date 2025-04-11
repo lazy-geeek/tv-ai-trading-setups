@@ -30,6 +30,7 @@ TRADING_USER_PROMPT = """
         *   **Liquidity Sweeps/Stop Hunts:** Price briefly piercing a key level before reversing sharply.
         *   **Breaks of Structure (BoS) / Changes of Character (ChoCH):** Clear shifts in price delivery indicating potential trend change.
         *   **Inducement:** Price creating seemingly obvious levels to entice retail traders before moving the opposite way.
+        *   **Fair value gaps** Rapid price movement leaving an imbalance that the market may later revisit to "fill" the gap
 
 6.  **Momentum & Volume (Proxy Assessment):**
     *   Assess shifts in **momentum** visually through candle size, range expansion, and the speed of price movement.
@@ -46,7 +47,7 @@ TRADING_USER_PROMPT = """
 9.  **Execution Plan:**
     *   **Entry:** Specify the **exact price level** and **order type** (e.g., Buy Limit @ X.XXXX, Sell Stop @ Y.YYYY, or Market Execution if entry conditions are met *now*). Justify the entry level (e.g., "entry at the 50% retracement of the impulse leg, coinciding with the H4 demand zone").
     *   **Stop Loss (SL):** Specify the **exact price level**. The SL must be placed at a **logical invalidation point** (e.g., below the low of the demand zone, above the high of the supply zone/pattern failure point). Justify the placement.
-    *   **Take Profit (TP):** Specify the **exact price level**. The TP should target a logical opposing level (e.g., next significant S/R, opposing S/D zone, measured move objective). Justify the target.
+    *   **Take Profit (TP):** Specify the **exact price level**. The TP should target a logical opposing level (e.g., next significant S/R, opposing S/D zone, measured move objective). Justify the target. Use only 1 target.
     *   **Risk/Reward Ratio (R/R):** Calculate and state the R/R ratio. Ensure it is **at least 1.5:1, ideally 2:1 or higher**. If the R/R is unfavorable despite technical confluence, reject the setup.
 
 10. **Honesty Clause:**
