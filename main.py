@@ -105,7 +105,7 @@ def generate_setups_for_symbol(symbol):
         total=len(openrouter_models), desc=f"Generating setups {symbol}", leave=False
     ) as pbar:
         for model_name in openrouter_models:
-            print_status(f"Generating setup for {symbol} using model: {model_name}")
+            # print_status(f"Generating setup for {symbol} using model: {model_name}") # Removed printing
             setup = get_openai_trading_setup(
                 openrouter_api_key,
                 openrouter_base_url,
